@@ -25,4 +25,18 @@ make_row
 write_table
 ```
 
+## SymbolTables
+
+Intended for looking up names and descriptions of model symbols in code. E.g., for correctly naming objects in tables. Also for writing preamble files with model notation.
+
+```@docs
+SymbolInfo
+SymbolTable
+add_symbol!
+has_symbol
+description
+latex
+group
+```
+
 -----------

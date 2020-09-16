@@ -90,7 +90,8 @@ end
 
 
 	param_tb_test();
-	beamer_test();
+    beamer_test();
+    include("symbol_table_test.jl")
 end
 
 # -----------

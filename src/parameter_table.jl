@@ -1,7 +1,7 @@
 """
-Parameter table
+    $(SIGNATURES)
 
-Columns are symbol, description, value
+Columns are symbol, description, value.
 
 Flow:
 1. Constructor
@@ -12,6 +12,11 @@ mutable struct ParameterTable
     tb :: Table
 end
 
+"""
+    $(SIGNATURES)
+
+Constructor.
+"""
 function ParameterTable()
     pt = ParameterTable(Table("lll"));
     add_row!(pt, "Parameter", "Description", "Value");
