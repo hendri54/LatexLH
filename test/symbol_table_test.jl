@@ -20,7 +20,7 @@ function symbol_table_test()
         for j = 1 : 5
             sStr = "s$j";
             sName = Symbol(sStr);
-            si = SymbolInfo(sName, sStr, "Description $sStr", "group$j");
+            si = SymbolInfo(sName, "\\alpha_$j", "Description $sStr", "group$j");
             add_symbol!(s, si);
             @test has_symbol(s, sName)
             s1 = s[sName];
@@ -31,10 +31,17 @@ function symbol_table_test()
         end
 
         println(s);
+        gl = LatexLH.group_list(s);
+        @test length(gl) == 5
 
         fPath = joinpath(testDir, "preamble.tex");
         open(fPath, "w") do io
             write_preamble(io, s);
+        end
+
+        fPath = joinpath(testDir, "notation_tex.tex");
+        open(fPath, "w") do io
+            write_notation_tex(io, s);
         end
 
         s2 = SymbolTable(["capShare"  "\\alpha"  "Capital share"  "Technology";

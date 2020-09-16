@@ -153,6 +153,20 @@ group(s :: SymbolTable, name :: Symbol) =
     group(s[name]);
 
 
+function group_list(s :: SymbolTable)
+    n = length(s);
+    gl = Vector{String}();
+    if n > 0
+        for (name, si) ∈ s.d
+            if !(group(si) ∈ gl)
+                push!(gl, group(si));
+            end
+        end
+    end
+    return gl
+end
+
+
 ## -------------  Preamble file
 
 
@@ -169,6 +183,47 @@ function write_preamble(io :: IO, s :: SymbolTable)
         end
     end
     return nothing
+end
+
+
+## -----------  Latex doc with notation, by group
+
+"""
+	$(SIGNATURES)
+
+Write a tex file with notation, by group. The output looks like:
+
+    Endowments
+    * \$\\alpha\$: some endowment
+    * \$\\beta\$: another endowment
+    Preferences
+    * [...]
+
+This writes a document section. It is meant to be included in the Notation section of an existing document.
+
+In `Lyx`: Insert | File | Child document. Use the `input` format (not `include`).
+"""
+function write_notation_tex(io :: IO, s :: SymbolTable)
+    # println(io, "\\Section{Notation}")
+    groupV = sort(group_list(s));
+    for group ∈ groupV
+        write_notation_tex_one_group(io, s, group);
+    end
+end
+
+function write_notation_tex_one_group(io :: IO, s :: SymbolTable, grp :: String)
+    println(io,  grp);
+    println(io,  "\\begin{itemize}");
+    for (name, si) ∈ s.d
+        if group(si) == grp
+            write_notation_line(io, si);
+        end
+    end
+    println(io, "\\end{itemize}");
+end
+
+function write_notation_line(io :: IO, si :: SymbolInfo)
+    println(io, "\\item \$", latex(si), "\$: ", description(si));
 end
 
 

@@ -39,6 +39,7 @@ latex
 group
 newcommand
 write_preamble
+write_notation_tex
 ```
 
 -----------
