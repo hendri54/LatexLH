@@ -37,6 +37,8 @@ has_symbol
 description
 latex
 group
+newcommand
+write_preamble
 ```
 
 -----------

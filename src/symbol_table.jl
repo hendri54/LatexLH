@@ -35,7 +35,7 @@ Make a latex `\\newcommand` from a symbol.
 
 # Example
 ```
-println(io, "# ", description(si));
+println(io, "% ", description(si));
 println(io, newcommand(si));
 ```
 """
@@ -164,7 +164,7 @@ Write a set of symbols to a preamble. The idea is that this defines notation in 
 function write_preamble(io :: IO, s :: SymbolTable)
     if !isempty(s)
         for (name, si) ∈ s.d
-            println(io, "# ", group(si), ": ", description(si));
+            println(io, "% ", group(si), ": ", description(si));
             println(io, newcommand(si));
         end
     end
