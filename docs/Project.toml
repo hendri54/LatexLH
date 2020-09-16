@@ -1,0 +1,7 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+FilesLH = "69233b93-b644-4f5d-9b2e-8880c8b19068"
+LatexLH = "5ba6fdca-9616-4e1b-a942-77ddac530f53"
+
+[compat]
+Documenter = "~0.24"
