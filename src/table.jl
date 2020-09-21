@@ -46,7 +46,11 @@ mutable struct Cell{T1 <: AbstractString, T2 <: Integer}
     color :: CellColor
 end
 
-# Cell with default color and alignment
+"""
+    $(SIGNATURES)
+
+Single `Cell` with default color and alignment.
+"""
 function Cell(txt :: T1) where T1 <: AbstractString
     return Cell(txt, 1, 'l', CellColor("blue", 0))
 end
@@ -55,6 +59,16 @@ function Cell(txt :: T1, align :: Char) where T1 <: AbstractString
     return Cell(txt, 1, align, CellColor("blue", 0))
 end
 
+"""
+	$(SIGNATURES)
+
+Specify a cell that spans multiple columns.
+
+# Example
+```
+Cell("Heading", 3)
+```
+"""
 function Cell(txt :: T1, width :: T2) where
     {T1 <: AbstractString, T2 <: Integer}
 
@@ -92,6 +106,13 @@ Flow
 1. Constructor
 2. Make and add rows (some are just provided by user as strings)
 3. Write table
+
+# Example
+```
+tb = Table(5, "lSSSS");
+add_row!(tb, " & \\multicolumn{3}{c}{Heading 1} & ");
+write_table(tb, "test.tex");
+```
 """
 mutable struct Table{T1 <: AbstractString, T2 <: Integer}
     # nRows :: T2
@@ -127,6 +148,13 @@ end
 	$(SIGNATURES)
 
 Add a row to a table.
+
+# Example
+```
+tb = Table(3, "lll");
+add_row!(tb, "Column1 & Column2 & Column3");
+add_row!(tb, "\\cline{2-3}")
+```
 """
 function add_row!(tb :: Table, rowStr :: T1) where T1 <: AbstractString
     push!(tb.bodyV, rowStr)
@@ -137,7 +165,15 @@ end
 """
 	$(SIGNATURES)
 
-Make a row from a vector of cells
+Make a row from a vector of cells.
+
+# Example
+```
+tb = Table(5, "lllll");
+# One single cell + one multicolumn cell that spans 4 columns.
+cellV = [LatexLH.Cell("cell1"),  LatexLH.Cell("cell2", 4, 'c')]
+rowStr = LatexLH.make_row(tb, cellV);
+```
 """
 function make_row(tb :: Table, cellV :: Vector{T1}) where T1
     nCols = 0;
@@ -182,8 +218,9 @@ function write_table(tb :: Table, filePath :: T1) where T1 <: AbstractString
         end
     end
 
-    pathV = splitpath(filePath);
-    println("Saved table  $(pathV[end])  to dir  $(pathV[end-1])")
+    # pathV = splitpath(filePath);
+    d, fn = splitdir(filePath);
+    println("Saved table  $fn  to dir  $d")
     return nothing
 end
 

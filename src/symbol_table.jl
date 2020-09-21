@@ -54,6 +54,9 @@ Base.show(io :: IO, s :: SymbolTable) =
 
 Base.isempty(s :: SymbolTable) = Base.isempty(s.d);
 Base.length(s :: SymbolTable) = Base.length(s.d);
+erase!(s :: SymbolTable) =
+    s.d = Dict{Symbol, SymbolInfo}();
+
 
 """
 	$(SIGNATURES)
@@ -80,6 +83,52 @@ function SymbolTable(m :: Matrix{String})
         add_symbol!(s, SymbolInfo(m[j,:]...));
     end
     return s
+end
+
+
+"""
+	$(SIGNATURES)
+
+Read a file that defines notation. Comma delimited.
+
+Format:
+- header row: Group | Name | Latex | Description
+- group rows: only the group entry is filled
+- other rows: only the other entries are filled
+
+# Example
+```
+Group,Name,Latex,Description
+G1,,,
+,nameG1,lG1,DescrG1
+G2,,,
+,nameG2,lG2,DescrG2
+```
+"""
+function SymbolTable(fPath :: AbstractString; delimChar = ',')
+    s = SymbolTable();
+    load_from_csv!(s, fPath; delimChar = delimChar);
+    return s
+end
+
+
+"""
+	$(SIGNATURES)
+
+Load a comma delimited file into an existing SymbolTable.
+Does not erase existing content.
+"""
+function load_from_csv!(s :: SymbolTable, fPath :: AbstractString; delimChar = ',')
+    m = readdlm(fPath, delimChar, String, skipstart = 1);
+    grp = "";
+    for j = 1 : size(m, 1)
+        if !isempty(m[j,1])
+            grp = m[j,1];
+        else
+            add_symbol!(s, SymbolInfo(m[j,2], m[j,3], m[j,4], grp));
+        end
+    end
+    return nothing
 end
 
 
@@ -177,11 +226,23 @@ Write a set of symbols to a preamble. The idea is that this defines notation in 
 """
 function write_preamble(io :: IO, s :: SymbolTable)
     if !isempty(s)
-        for (name, si) ∈ s.d
-            println(io, "% ", group(si), ": ", description(si));
+        groupV = sort(group_list(s));
+        for group ∈ groupV
+            write_preamble_one_group(io, s, group);
+        end
+    end
+    return nothing
+end
+
+function write_preamble_one_group(io :: IO, s :: SymbolTable, grp)
+    println(io, "% =====  ", grp, ":");
+    for (name, si) ∈ s.d
+        if group(si) == grp
+            println(io, "% ", description(si));
             println(io, newcommand(si));
         end
     end
+    println(io, "% ----------");
     return nothing
 end
 
@@ -212,18 +273,37 @@ function write_notation_tex(io :: IO, s :: SymbolTable)
 end
 
 function write_notation_tex_one_group(io :: IO, s :: SymbolTable, grp :: String)
-    println(io,  grp);
-    println(io,  "\\begin{itemize}");
+    println(io,  grp, "\n");
+    # println(io,  "\\begin{itemize}");
+    println(io, "\\begin{tabular}{lll}")
+    println(io, "\\hline");
+    # println(io, "Symbol & Abbrev. & Description", "\\tabularnewline");
+    # println(io, "\\hline");
+
+    listV = Vector{String}();
     for (name, si) ∈ s.d
         if group(si) == grp
-            write_notation_line(io, si);
+            push!(listV, notation_line(si));
         end
     end
-    println(io, "\\end{itemize}");
+    listV = sort(listV);
+    for line ∈ listV
+        println(io, line);
+    end
+    # println(io, "\\end{itemize}");
+    println(io, "\\hline");
+    println(io, "\\end{tabular}")
+    println(io, " ")
 end
 
-function write_notation_line(io :: IO, si :: SymbolInfo)
-    println(io, "\\item \$", latex(si), "\$: ", description(si));
+# Line in latex file of the form
+# `* \\alpha:  Capital share (capShare)`
+# where `capShare` is the `newcommand` defined for the symbol.
+function notation_line(si :: SymbolInfo)
+    return "\$" * latex(si) * "\$ & $(si.name) & " * description(si) *
+        "\\tabularnewline";
+        # println(io, "\\item \$", latex(si), "\$:  ", description(si), 
+        # "  ($(si.name))");
 end
 
 

@@ -17,7 +17,8 @@ function symbol_table_test()
         @test isempty(s)
         @test length(s) == 0
 
-        for j = 1 : 5
+        # Reverse, so that sorting can be checked in output files.
+        for j = 5 : -1 : 1
             sStr = "s$j";
             sName = Symbol(sStr);
             si = SymbolInfo(sName, "\\alpha_$j", "Description $sStr", "group$j");
@@ -25,7 +26,7 @@ function symbol_table_test()
             @test has_symbol(s, sName)
             s1 = s[sName];
             @test s1.name == sName
-            @test length(s) == j
+            @test length(s) == 6 - j
 
             @test description(s, sName) == description(si)
         end
@@ -51,9 +52,35 @@ function symbol_table_test()
     end
 end
 
+function write_st_csv()
+    fPath = joinpath(testDir, "st_csv.csv");
+    open(fPath, "w") do io
+        for ig = 1 : 3
+            println(io, "G$ig,,,");
+            for j = 1 : 2
+                println(io, ",n$ig$j,l$ig$j,descr$ig$j");
+            end
+        end
+    end
+    return fPath
+end
+
+function load_st_test()
+    fPath = write_st_csv();
+    @test isfile(fPath)
+    s = SymbolTable(fPath);
+    @test has_symbol(s, :n11)
+    @test has_symbol(s, :n32)
+    si = s[:n21];
+    @test group(si) == "G2"
+    @test latex(si) == "l21"
+end
+
+
 @testset "SymbolTable" begin
     symbol_info_test();
     symbol_table_test();
+    load_st_test();
 end
 
 # -----------

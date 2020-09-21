@@ -13,6 +13,8 @@ figure_slide
 
 ## Writing Latex Tables
 
+Latex tables are written row by row. First, initialize an empty `Table` object. Then add rows one by one using `add_rows!`. Any horizontal lines must be added by hand, except for `\toprule` and `\bottomrule` (which require the Latex package `booktabs`).
+
 ```@docs
 CellColor
 Cell
@@ -28,6 +30,8 @@ write_table
 ## SymbolTables
 
 Intended for looking up names and descriptions of model symbols in code. E.g., for correctly naming objects in tables. Also for writing preamble files with model notation.
+
+A `SymbolTable` can be constructed from a `String` array or from a delimited file.
 
 ```@docs
 SymbolInfo
