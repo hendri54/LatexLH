@@ -1,48 +1,3 @@
-"""
-	$(SIGNATURES)
-
-Information for one symbol: name, latex symbol, description, group.
-
-For printing: `\\` needs to be escaped as `\\\\` in `latex`.
-"""
-struct SymbolInfo
-    name :: Symbol
-    latex :: String
-    description :: String
-    group :: String
-end
-
-"""
-	$(SIGNATURES)
-
-Constructor from strings.
-"""
-SymbolInfo(name :: AbstractString, l :: AbstractString, 
-    d :: AbstractString, g :: AbstractString) = 
-    SymbolInfo(Symbol(name), l, d, g);
-
-Base.show(io :: IO, si :: SymbolInfo) = 
-    print(io, "Symbol $(si.name)");
-
-description(si :: SymbolInfo) = si.description;
-group(si :: SymbolInfo) = si.group;
-latex(si :: SymbolInfo) = si.latex;
-
-"""
-	$(SIGNATURES)
-
-Make a latex `\\newcommand` from a symbol.
-
-# Example
-```
-println(io, "% ", description(si));
-println(io, newcommand(si));
-```
-"""
-newcommand(si :: SymbolInfo) = 
-    "\\newcommand{\\$(si.name)}{$(latex(si))}";
-
-
 ## ----------  SymbolTable
 
 struct SymbolTable
@@ -54,8 +9,18 @@ Base.show(io :: IO, s :: SymbolTable) =
 
 Base.isempty(s :: SymbolTable) = Base.isempty(s.d);
 Base.length(s :: SymbolTable) = Base.length(s.d);
-erase!(s :: SymbolTable) =
-    s.d = Dict{Symbol, SymbolInfo}();
+
+"""
+	$(SIGNATURES)
+
+Erase the SymbolTable in place.
+test this +++
+"""
+function erase!(s :: SymbolTable)
+    for k in keys(s.d)
+        delete!(s.d, k);
+    end
+end
 
 
 """
@@ -134,7 +99,8 @@ end
 
 ## ----------  Adding symbols
 
-Base.setindex!(s :: SymbolTable, si :: SymbolInfo) = s.d[si.name] = si;
+Base.setindex!(s :: SymbolTable, si :: SymbolInfo) = 
+    s.d[si.name] = si;
 
 """
 	$(SIGNATURES)
@@ -145,7 +111,7 @@ function add_symbol!(s :: SymbolTable, si :: SymbolInfo;
     replaceExisting :: Bool = false)
 
     if !replaceExisting
-        @assert !has_symbol(s, si.name)  "$name already exists"
+        @assert !has_symbol(s, si.name)  "$(si.name) already exists"
     end
     s.d[si.name] = si;
     return nothing
@@ -304,6 +270,24 @@ function notation_line(si :: SymbolInfo)
         "\\tabularnewline";
         # println(io, "\\item \$", latex(si), "\$:  ", description(si), 
         # "  ($(si.name))");
+end
+
+
+## --------  For testing
+
+function test_symbol_table(nGroups, nSyms)
+    s = SymbolTable();
+    for ig = nGroups : -1 : 1
+        gName = "$group$ig";
+        # Reverse, so that sorting can be checked in output files.
+        for j = nSyms : -1 : 1
+            sStr = "s_$(ig)_$j";
+            sName = Symbol(sStr);
+            si = SymbolInfo(sName, "\\alpha_{$ig,$j}", "Description $sStr in $gName", gName);
+            add_symbol!(s, si);
+        end
+    end
+    return s
 end
 
 

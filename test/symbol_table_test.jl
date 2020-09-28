@@ -17,23 +17,14 @@ function symbol_table_test()
         @test isempty(s)
         @test length(s) == 0
 
-        # Reverse, so that sorting can be checked in output files.
-        for j = 5 : -1 : 1
-            sStr = "s$j";
-            sName = Symbol(sStr);
-            si = SymbolInfo(sName, "\\alpha_$j", "Description $sStr", "group$j");
-            add_symbol!(s, si);
-            @test has_symbol(s, sName)
-            s1 = s[sName];
-            @test s1.name == sName
-            @test length(s) == 6 - j
-
-            @test description(s, sName) == description(si)
-        end
+        nGroups = 3;
+        nSyms = 4;
+        s = LatexLH.test_symbol_table(nGroups, nSyms);
+        @test length(s) == nGroups * nSyms
 
         println(s);
         gl = LatexLH.group_list(s);
-        @test length(gl) == 5
+        @test length(gl) == nGroups
 
         fPath = joinpath(testDir, "preamble.tex");
         open(fPath, "w") do io
@@ -44,6 +35,9 @@ function symbol_table_test()
         open(fPath, "w") do io
             write_notation_tex(io, s);
         end
+
+        erase!(s);
+        @test isempty(s)
 
         s2 = SymbolTable(["capShare"  "\\alpha"  "Capital share"  "Technology";
             "tfp"  "A"  "Total factor productivity"  "Technology"]);
