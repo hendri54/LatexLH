@@ -3,7 +3,106 @@
 """
 	$(SIGNATURES)
 
-Make a file that contains a set of slides. Each slide is just a title with one figure. Input is a vector of tuples. Each contains a title and a file path for the figure file.
+Escape latex string, including `_`.
+
+test this +++++
+must ignore already escaped ones
+"""
+function escape_string(s :: AbstractString)
+    return replace(s, "_" => "\\_")
+end
+
+
+"""
+	$(SIGNATURES)
+
+Write header for a Beamer slide file. Lines up to "begin{document}".
+
+# Arguments
+- useBookTabs (optional): Includes `booktabs` for tables.
+- lineV (optional): additional lines to write to preamble, such as `usepackage` or `input` lines.
+"""
+function write_beamer_header(io :: IO; useBookTabs :: Bool = true,
+    lineV = nothing)
+
+    write_lines(io, [
+        "\\documentclass[english]{beamer}",
+        "\\usepackage[T1]{fontenc}",
+        "\\usepackage{graphicx}",
+        "\\usepackage{adjustbox}",  # used to size tables
+    ]);
+
+    if useBookTabs
+        write_lines(io, "\\usepackage{booktabs}");
+    end
+
+    write_lines(io, lineV);
+
+    write_lines(io, [
+        "\\makeatletter",
+        "\\newcommand\\makebeamertitle{\\frame{\\maketitle}}%",
+        "\\makeatother",
+        "\\begin{document}"
+    ]);
+end
+
+
+
+write_lines(io :: IO, x :: Nothing) = nothing;
+write_lines(io :: IO, x :: AbstractString) = println(io, x);
+
+"""
+	$(SIGNATURES)
+
+Write lines to latex file. Strings must be properly escaped.
+"""
+function write_lines(io :: IO, xV)
+    for x in xV
+        println(io, x);
+    end
+end
+
+"""
+	$(SIGNATURES)
+
+Write footer for a Beamer slide file.
+"""
+function write_beamer_footer(io :: IO)
+    write_lines(io, "\\end{document}")
+end
+
+
+"""
+	$(SIGNATURES)
+
+Typeset a file with `pdflatex`.
+"""
+function typeset_file(fPath)
+    @assert isfile(fPath)  "Not found: $fPath"
+    fDir, _ = splitdir(fPath);
+    logFn = joinpath(fDir, "lyx_typeset.log");
+    # Beware: if the process asks for user input, this could hang!
+    # That's why `halt-on-error` is important.
+    success = try 
+        run(pipeline(`pdflatex -halt-on-error -output-directory $fDir $fPath`, 
+            logFn));
+        true
+    catch
+        @warn "Could not typeset file  $fPath"
+        false
+    end
+    return success
+end
+
+
+
+"""
+	$(SIGNATURES)
+
+Make a file that contains a set of slides. Each slide is just a title with one figure or table. 
+
+Input is a vector of tuples. Each contains a title and a file path for the figure or table file. Assume that tables have extension ".tex". Otherwise, assume the file is a figure.
+
 Optionally, preprend a common base directory to each path.
 """
 function write_figure_slides(io :: IO,  slideV;
@@ -14,14 +113,23 @@ function write_figure_slides(io :: IO,  slideV;
     end
 end
 
+is_table_path(fPath) = splitext(fPath)[2] == ".tex";
+
 
 """
 	$(SIGNATURES)
 
-Write lines for a slide that contains one figure to `io`.
+Write lines for a slide that contains one figure or table to `io`.
+
+File extension determines whether a figure or table is written.
 """
 function write_figure_slide(io :: IO, title, figPath)
-    for line ∈ figure_slide(title, figPath)
+    if is_table_path(figPath)
+        lineV = table_slide(title, figPath);
+    else
+        lineV = figure_slide(title, figPath);
+    end 
+    for line ∈ lineV
         println(io, line);
     end
 end
@@ -42,7 +150,7 @@ function figure_slide(title, fPath)
 end
 
 function begin_frame(title)
-    return "\\begin{frame}{$title}";
+    return "\\begin{frame}{$(escape_string(title))}";
 end
 
 function end_frame()
@@ -54,6 +162,22 @@ function include_figure(fPath)
         "\\begin{center}",
         "\\includegraphics[width=0.95\\textwidth]{$fPath}",
         "\\end{center}"
+    ]    
+end
+
+## ---------  Table slides
+
+# Using `include` can generate write errors.
+function table_slide(title, fPath)
+    return [
+        begin_frame(title),
+        "\\begin{table}[h]",
+        "\\centering",
+        "\\begin{adjustbox}{width=1\\textwidth}",
+        "\\input{$fPath}",
+        "\\end{adjustbox}",
+        "\\end{table}",
+        end_frame()
     ]    
 end
 

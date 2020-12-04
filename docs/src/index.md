@@ -9,6 +9,9 @@ CurrentModule = LatexLH
 ```@docs
 write_figure_slides
 figure_slide
+write_beamer_header
+write_beamer_footer
+typeset_file
 ```
 
 ## Writing Latex Tables

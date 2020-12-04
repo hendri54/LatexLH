@@ -3,6 +3,8 @@ module LatexLH
 using DelimitedFiles
 using DocStringExtensions
 
+# Beamer
+export write_beamer_header, write_beamer_footer, typeset_file
 export write_figure_slide, figure_slide
 # Tables
 export CellColor, Cell
@@ -20,6 +22,5 @@ include("parameter_table.jl");
 include("symbol_info.jl");
 include("symbol_table.jl");
 include("beamer.jl")
-# include("latex/symbol_table.jl")
 
 end # module

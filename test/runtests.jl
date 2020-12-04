@@ -12,12 +12,19 @@ function beamer_test()
 		fPath = joinpath(testDir, "beamer_test.tex");
 		isfile(fPath)  &&  rm(fPath);
 		open(fPath, "w") do io
-			for figName ∈ ("afqtMeanByQual", "fracGradByQual")
-				figPath = joinpath(testDir, figName * ".pdf");
+			write_beamer_header(io);
+			for figName ∈ ("afqtMeanByQual.pdf", "fracGradByQual.pdf", 
+				"parameter_table_test.tex")
+
+				figPath = joinpath(testDir, figName);
 				write_figure_slide(io, figName, figPath);
 			end
+			write_beamer_footer(io);
 		end
 		@test isfile(fPath)
+
+		success = typeset_file(fPath);
+		@test success
 	end
 end
 
