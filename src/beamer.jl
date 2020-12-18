@@ -30,6 +30,7 @@ function write_beamer_header(io :: IO; useBookTabs :: Bool = true,
         "\\usepackage[T1]{fontenc}",
         "\\usepackage{graphicx}",
         "\\usepackage{adjustbox}",  # used to size tables
+        "\\usepackage{verbatim}"  # for including plain text files
     ]);
 
     if useBookTabs
@@ -114,6 +115,8 @@ function write_figure_slides(io :: IO,  slideV;
 end
 
 is_table_path(fPath) = splitext(fPath)[2] == ".tex";
+is_figure_path(fPath) = splitext(fPath)[2] == ".pdf";
+is_text_path(fPath) = splitext(fPath)[2] == ".txt";
 
 
 """
@@ -126,8 +129,13 @@ File extension determines whether a figure or table is written.
 function write_figure_slide(io :: IO, title, figPath)
     if is_table_path(figPath)
         lineV = table_slide(title, figPath);
-    else
+    elseif is_text_path(figPath)
+        lineV = text_slide(title, figPath);
+    elseif is_figure_path(figPath)
         lineV = figure_slide(title, figPath);
+    else
+        _, fExt = splitext(figPath);
+        @warn "File extension not recognized: $fExt"
     end 
     for line ∈ lineV
         println(io, line);
@@ -180,5 +188,20 @@ function table_slide(title, fPath)
         end_frame()
     ]    
 end
+
+
+## ---------  Verbatim text
+
+function text_slide(title, fPath)
+    return [
+        begin_frame(title),
+        # "\\centering",
+        # "\\begin{adjustbox}{width=1\\textwidth}",
+        "\\verbatiminput{$fPath}",
+        # "\\end{adjustbox}",
+        end_frame()
+    ]    
+end
+
 
 # ------------
