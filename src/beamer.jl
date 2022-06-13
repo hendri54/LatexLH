@@ -79,7 +79,9 @@ end
 Typeset a file with `pdflatex`.
 """
 function typeset_file(fPath)
-    @assert isfile(fPath)  "Not found: $fPath"
+    @assert isfile(fPath)  "Not found: $fPath";
+    fExt = last(splitext(fPath));
+    @assert fExt == ".tex"  "Invalid extension: $fPath";
     fDir, _ = splitdir(fPath);
     logFn = joinpath(fDir, "lyx_typeset.log");
     # Beware: if the process asks for user input, this could hang!

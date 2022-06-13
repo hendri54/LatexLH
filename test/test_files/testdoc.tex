@@ -1,0 +1,58 @@
+\documentclass[english]{article}
+
+\setlength{\parskip}{\smallskipamount}
+
+\setlength{\parindent}{0pt}
+
+\usepackage[T1]{fontenc}
+
+\usepackage[latin9]{inputenc}
+
+\usepackage{geometry}
+
+\geometry{verbose,tmargin=1in,bmargin=1cm,lmargin=2cm,rmargin=2cm}
+
+\usepackage{graphicx}
+
+\usepackage{booktabs}
+
+\makeatletter
+
+\input{/Users/lutz/Documents/julia/LatexLH/test/test_files/test_doc_preamble.tex}
+
+\newcommand{\testOne}{1}
+
+\newcommand{\testTwo}{2}
+
+\usepackage{siunitx}
+
+\makeatother
+
+\begin{document}
+
+\section{Level 1 header}
+
+This is the document body.
+
+Testing preamble constants: $\testOne$ and $\testTwo$.
+
+Testing included file: $\testDocOne$ and $\testDocTwo$.
+
+\subsection{Included graphics}
+
+\includegraphics[width=0.75\textwidth]{/Users/lutz/Documents/julia/LatexLH/test/test_files/afqtMeanByQual.pdf}
+
+afqtMeanByQual.pdf
+
+\includegraphics[width=0.5\textwidth]{/Users/lutz/Documents/julia/LatexLH/test/test_files/afqtMeanByQual.pdf} \includegraphics[width=0.5\textwidth]{/Users/lutz/Documents/julia/LatexLH/test/test_files/afqtMeanByQual.pdf}
+
+fracGradByQual.pdf
+
+\includegraphics[width=0.5\textwidth]{/Users/lutz/Documents/julia/LatexLH/test/test_files/fracGradByQual.pdf} \includegraphics[width=0.5\textwidth]{/Users/lutz/Documents/julia/LatexLH/test/test_files/fracGradByQual.pdf}
+
+\subsection{Included tables}
+
+\input{/Users/lutz/Documents/julia/LatexLH/test/test_files/TableTest.tex}
+
+\end{document}
+

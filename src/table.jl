@@ -220,7 +220,7 @@ function write_table(tb :: Table, filePath :: T1) where T1 <: AbstractString
 
     # pathV = splitpath(filePath);
     d, fn = splitdir(filePath);
-    println("Saved table  $fn  to dir  $d")
+    # println("Saved table  $fn  to dir  $d");
     return nothing
 end
 

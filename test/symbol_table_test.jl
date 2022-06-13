@@ -13,6 +13,7 @@ end
 
 function symbol_table_test()
     @testset "SymbolTable" begin
+        testDir = test_dir();
         s = SymbolTable();
         @test isempty(s)
         @test length(s) == 0
@@ -47,7 +48,7 @@ function symbol_table_test()
 end
 
 function write_st_csv()
-    fPath = joinpath(testDir, "st_csv.csv");
+    fPath = joinpath(test_dir(), "st_csv.csv");
     open(fPath, "w") do io
         for ig = 1 : 3
             println(io, "G$ig,,,");
