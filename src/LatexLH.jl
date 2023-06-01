@@ -5,7 +5,7 @@ using DocStringExtensions
 
 # Beamer
 export write_beamer_header, write_beamer_footer, typeset_file
-export write_figure_slide, figure_slide
+export write_figure_slide, figure_slide, table_slide;
 
 # Tables
 export CellColor, Cell
@@ -23,7 +23,7 @@ export write_preamble, write_notation_tex
 # Writing tex files and their pieces
 export write_doc, doc_header, doc_footer;
 export figure_comparison;
-export latex_table, latex_section, latex_figures, latex_figure;
+export latex_table, latex_section, latex_figures, latex_figure, latex_line;
 export figures_side_by_side;
 
 # Testing

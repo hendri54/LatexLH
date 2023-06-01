@@ -7,6 +7,7 @@ Write a complete tex document to a file.
 - `fPath`: File path.
 - `docBodyV`: Vector of String with document body.
 - `preambleCommands`: Vector of String with preamble commands.
+- `inputFiles`: Vector of String with files to include in preamble.
 """
 function write_doc(fPath :: AbstractString, docBodyV :: AbstractVector{String};
         preambleCommands = nothing, inputFiles = nothing)
@@ -99,6 +100,14 @@ function figure_comparison(dirV :: AbstractVector{String},
     typeset  &&  typeset_file(fPath);
 end
 
+
+"""
+	$(SIGNATURES)
+
+Find all common files in a set of directories `dirV`. Optionally restrict to given file extensions (provided as ".ext").
+
+move to FilesLH +++++
+"""
 function common_files(dirV; fileExtensions = nothing)
     d1 = readdir(first(dirV));
     if !isnothing(fileExtensions)

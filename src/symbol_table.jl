@@ -145,18 +145,28 @@ end
 """
 	$(SIGNATURES)
 
-Return description of a symbol.
+Return description of a symbol. If not found, return `defaultValue`.
 """
-description(s :: SymbolTable, name :: Symbol) =
-    description(s[name]);
+function description(s :: SymbolTable, name :: Symbol; defaultValue = string(name))
+    if has_symbol(s, name)
+        return description(s[name]);
+    else
+        return defaultValue;
+    end
+end
 
 """
 	$(SIGNATURES)
 
-Latex symbol for a symbol.
+Latex symbol for a symbol. If not found, return `defaultValue`.
 """
-latex(s :: SymbolTable, name :: Symbol) =
-    latex(s[name]);
+function latex(s :: SymbolTable, name :: Symbol; defaultValue = string(name))
+    if has_symbol(s, name)
+        return latex(s[name]);
+    else
+        return defaultValue
+    end
+end
 
 
 """

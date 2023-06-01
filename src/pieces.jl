@@ -26,6 +26,16 @@ end
 """
 	$(SIGNATURES)
 
+Write a latex line, replacing characters that do not typeset.
+"""
+function latex_line(lineIn)
+    replace(lineIn, '_' => '-', '[' => '(', ']' => ')');
+end
+
+
+"""
+	$(SIGNATURES)
+
 Input command for a table.
 """
 function latex_table(fPath)
