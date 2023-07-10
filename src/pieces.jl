@@ -14,7 +14,7 @@ function figures_side_by_side(dirV, fnV; showFileNames = true)
     for fn in fnV
         if showFileNames
             iRow += 1;
-            sV[iRow] = fn;
+            sV[iRow] = latex_line(fn);
         end
         iRow += 1;
         sV[iRow] = latex_figures(dirV, fn);
